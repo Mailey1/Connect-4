@@ -28,48 +28,7 @@ class Connect4Board:
 		self.num_turns += 1
 		return True
 		
-	# Assume that the board currently has no connect 4's. Place the computer's coloured piece in every single open (0) cell
-	# on the board, then check if the creates a connect 4. Then do the same for the player's coloured pieces, and the heuristic
-	# is the difference.
-	def eval_board(self, computer_colour, player_colour):
-		computer_wins = 0
-		player_wins = 0
-		# Use a board copy just to be safe.
-		board2 = Connect4Board(1)
-		board2.copy_board(self)
-		
-		# Iterate over every entry in board2, if it's empty then it's cell is a 0. If that's the case fill it with a piece
-		# of the computer's colour and check if it's a win. Then do the same for the player colour. Then change it back to a 0.
-		for i in range(board2.num_cols):
-			for j in range(board2.num_rows):
-				if board2.board[i][j] != 0:
-					continue
-				board2.board[i][j] = computer_colour
-				if board2.has_winner(computer_colour):
-					computer_wins += 1
-					print("Winning board for computer")
-					print(board2)
-				board2.board[i][j] = player_colour
-				if board2.has_winner(player_colour):
-					player_wins += 1
-					print("Winning board for player")
-					print(board2)
-				board2.board[i][j] = 0
-				
-		return computer_wins - player_wins
-	
 	# iterate across the columns (second index), and print out the entries of the rows from the bottom up.
-	def __str__(self):
-		output = ""
-		space = ""
-		for j in range(self.num_rows):
-			for i in range(self.num_cols):
-				output += str(self.board[i][self.num_rows - 1 - j])
-				space = " "
-				output += space
-			output += '\n'
-		return output
-		
 	def has_winner(self, colour):
 		# iterate through each column and check for a win
 		for i in range(self.num_cols):
@@ -92,5 +51,59 @@ class Connect4Board:
 				if (colour == self.board[i][j] == self.board[i-1][j+1] == self.board[i-2][j+2] == self.board[i-3][j+3]):
 					return True
 		return False
+		
+	# Assume that the board currently has no connect 4's. Place the computer's coloured piece in every single open (0) cell
+	# on the board, then check if the creates a connect 4. Then do the same for the player's coloured pieces, and the heuristic
+	# is the difference.
+	def eval_board(self, computer_colour, player_colour):
+		computer_wins = 0
+		player_wins = 0
+		# Use a board copy just to be safe.
+		board2 = Connect4Board(1)
+		board2.copy_board(self)
+		
+		# Iterate over every entry in board2, if it's empty then it's cell is a 0. If that's the case fill it with a piece
+		# of the computer's colour and check if it's a win. Then do the same for the player colour. Then change it back to a 0.
+		for i in range(board2.num_cols):
+			for j in range(board2.num_rows):
+				if board2.board[i][j] != 0:
+					continue
+				board2.board[i][j] = computer_colour
+				if board2.has_winner(computer_colour):
+					computer_wins += 1
+				board2.board[i][j] = player_colour
+				if board2.has_winner(player_colour):
+					player_wins += 1
+				board2.board[i][j] = 0
+				
+		return computer_wins - player_wins
+		
+	# Returns a list containing all valid successors, unless the board already contains a victory.
+	# Let turn = 0 denote the computer's turn, 1 denote player turn
+	def get_successors(self, computer_colour, player_colour, turn):
+		successors = []
+		if (self.has_winner(computer_colour) or self.has_winner(player_colour)):
+			return successors
+		colour = computer_colour
+		if turn == 1:
+			colour = player_colour
+		for i in range(self.num_cols):
+			successor = Connect4Board(0)
+			successor.copy_board(self)
+			if successor.insert_piece(i, colour):
+				successors += [successor]
+		return successors
+		
+	def __str__(self):
+		output = ""
+		space = ""
+		for j in range(self.num_rows):
+			for i in range(self.num_cols):
+				output += str(self.board[i][self.num_rows - 1 - j])
+				space = " "
+				output += space
+			output += '\n'
+		return output
+		
 		
 	

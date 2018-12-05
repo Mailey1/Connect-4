@@ -1,8 +1,9 @@
-import random
 from Connect4Board import Connect4Board
+from Connect4Search import Connect4Search
 
 game = Connect4Board(7)
 print(game)
+search = Connect4Search(game)
 human_turn = True
 print("Human will play red ('R'), computer will play black ('B')")
 
@@ -19,8 +20,8 @@ while True:
 			break
 		human_turn = False
 	else:
-		move = random.randint(0,6)
-		game.insert_piece(move, 'B')
+		computer_played = search.best_move(5, 'B', 'R')
+		game.copy_board(computer_played)
 		print(game)
 		print("Computer has (randomly) placed his piece in column " + str(move + 1))
 		if game.has_winner('B'):
